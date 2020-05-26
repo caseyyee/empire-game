@@ -8,11 +8,8 @@ import React, {
 import { Box, Flex, Badge, Button } from "@chakra-ui/core";
 import NumberFormat from "react-number-format";
 import { useAnimation } from "framer-motion";
-import {
-  AccountsDispatch,
-  AccountsState,
-  CompaniesDispatch,
-} from "../containers/Container";
+import { AccountsState, CompaniesDispatch } from "../containers/Container";
+import useAccount from "../hooks/useAccount";
 import CompanyIconButton from "./CompanyIconButton";
 import CompanyLevelProgress from "./CompanyLevelProgress";
 import BoxButton from "./BoxButton";
@@ -52,13 +49,14 @@ export default ({
   manager,
   purchased,
 }) => {
-  const accountsDispatch = useContext(AccountsDispatch);
   const accountsState = useContext(AccountsState);
   const companiesDispatch = useContext(CompaniesDispatch);
   const countdownInterval = useRef(null);
   const animationControl = useAnimation();
 
   const [state, dispatch] = useReducer(reducer, initialCompanyState);
+
+  const { applyAmount } = useAccount();
 
   const duration = production_time / state.level / 1000;
   const [countdown, setCountdown] = useState(duration);
@@ -79,7 +77,7 @@ export default ({
       originY: [1, 1],
     });
     dispatch({ type: "selling", payload: false });
-    accountsDispatch({ type: "credit", payload: aggregateCost });
+    applyAmount(aggregateCost);
   };
 
   const onFinishSale = () => {
@@ -94,12 +92,12 @@ export default ({
       dispatch({ type: "add_level" });
     }
     dispatch({ type: "buy_branch" });
-    accountsDispatch({ type: "debit", payload: branchCost });
+    applyAmount(-branchCost);
   };
 
   useEffect(() => {
     if (purchased) {
-      accountsDispatch({ type: "debit", payload: company_purchase_cost });
+      applyAmount(-company_purchase_cost);
     }
   }, [purchased]);
 

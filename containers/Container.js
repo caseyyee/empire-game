@@ -26,10 +26,8 @@ export const GameDispatch = createContext();
 
 const accountsReducer = (state, action) => {
   switch (action.type) {
-    case "credit":
+    case "apply_amount":
       return { ...state, balance: state.balance + action.payload };
-    case "debit":
-      return { ...state, balance: state.balance - action.payload };
     default:
       throw new Error();
   }
