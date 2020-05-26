@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useContext } from "react";
 
 import { AccountsDispatch } from "../containers/Container";
 
-export default ({ delay = 1000 } = {}) => {
+export default ({ delay = 4000 } = {}) => {
   const accountsDispatch = useContext(AccountsDispatch);
 
   const queue = useRef([]);
@@ -11,10 +11,7 @@ export default ({ delay = 1000 } = {}) => {
   const dispatchQueue = () => {
     if (queue.current.length !== 0) {
       const sum = queue.current.reduce((a, b) => a + b);
-
-      console.log("dispatching sum", sum);
       accountsDispatch({ type: "apply_amount", payload: sum });
-
       queue.current = [];
     }
   };
@@ -30,7 +27,6 @@ export default ({ delay = 1000 } = {}) => {
     const lastQueued = now - last.current;
 
     if (queue.current.length === 1 && lastQueued > delay) {
-      console.log("immediate");
       dispatchQueue();
     }
 

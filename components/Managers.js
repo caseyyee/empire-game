@@ -2,11 +2,11 @@ import React, { useContext } from "react";
 
 import { Box, Flex, Button } from "@chakra-ui/core";
 import {
-  AccountsDispatch,
   AccountsState,
   CompaniesState,
   CompaniesDispatch,
 } from "../containers/Container";
+import useAccount from "../hooks/useAccount";
 import AppHead from "./AppHead";
 import NumberFormat from "react-number-format";
 import BoxButton from "./BoxButton";
@@ -14,14 +14,15 @@ import CompanyIconButton from "./CompanyIconButton";
 import config from "../config";
 
 export default (props) => {
-  const accountsDispatch = useContext(AccountsDispatch);
   const accountsState = useContext(AccountsState);
   const companies = useContext(CompaniesState);
   const dispatch = useContext(CompaniesDispatch);
 
+  const { applyAmount } = useAccount();
+
   const hireManager = (key, cost) => {
     dispatch({ type: "hire_manager", payload: key });
-    accountsDispatch({ type: "debit", payload: cost });
+    applyAmount(-cost);
   };
 
   return (
