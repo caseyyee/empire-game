@@ -1,10 +1,7 @@
 import { Box, Heading, Image, Flex } from "@chakra-ui/core";
 import { useContext, useMemo, useReducer, useEffect } from "react";
-import {
-  GameDispatch,
-  AccountsState,
-  CompaniesState,
-} from "../containers/Container";
+import { GameDispatch, CompaniesState } from "../containers/Container";
+import useAccount from "../hooks/useAccount";
 import AppHead from "./AppHead";
 import OpenFromDock from "./OpenFromDock";
 import AppInstallButton from "./AppInstallButton";
@@ -32,9 +29,8 @@ const reducer = (state, action) => {
 
 export default (props) => {
   const gameDispatch = useContext(GameDispatch);
-  const accountsState = useContext(AccountsState);
   const companiesState = useContext(CompaniesState);
-
+  const { balance } = useAccount();
   const initialState = ComponentState.Intro;
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -49,17 +45,14 @@ export default (props) => {
   useEffect(() => {
     // Users balance is larger than the minimum cost of a manager,
     // We'll notify to Install the Managers app.
-    if (
-      accountsState.balance > minManagerCost &&
-      state !== ComponentState.Managed
-    ) {
+    if (balance > minManagerCost && state !== ComponentState.Managed) {
       dispatch({ type: "CanManage" });
       gameDispatch({
         type: "set_app_badge",
         payload: { key: "news", value: true },
       });
     }
-  }, [accountsState.balance]);
+  }, [balance]);
 
   useEffect(() => {
     if (state === ComponentState.CanManage) {

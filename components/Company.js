@@ -8,11 +8,8 @@ import React, {
 import { Box, Flex, Badge, Button } from "@chakra-ui/core";
 import NumberFormat from "react-number-format";
 import { useAnimation } from "framer-motion";
-import {
-  AccountsDispatch,
-  AccountsState,
-  CompaniesDispatch,
-} from "../containers/Container";
+import { CompaniesDispatch } from "../containers/Container";
+import useAccount from "../hooks/useAccount";
 import CompanyIconButton from "./CompanyIconButton";
 import CompanyLevelProgress from "./CompanyLevelProgress";
 import BoxButton from "./BoxButton";
@@ -52,13 +49,13 @@ export default ({
   manager,
   purchased,
 }) => {
-  const accountsDispatch = useContext(AccountsDispatch);
-  const accountsState = useContext(AccountsState);
   const companiesDispatch = useContext(CompaniesDispatch);
   const countdownInterval = useRef(null);
   const animationControl = useAnimation();
 
   const [state, dispatch] = useReducer(reducer, initialCompanyState);
+
+  const { applyAmount, balance } = useAccount();
 
   const duration = production_time / state.level / 1000;
   const [countdown, setCountdown] = useState(duration);
@@ -66,7 +63,7 @@ export default ({
   const aggregateCost = state.branches * unit_price;
   const branchCost =
     state.branches * company_branch_cost * company_branch_cost_multiplier;
-  const canBePurchased = accountsState.balance >= company_purchase_cost;
+  const canBePurchased = balance >= company_purchase_cost;
 
   const getLevelProgress = (branches) =>
     (branches % branch_level_up_count) / branch_level_up_count;
@@ -79,7 +76,7 @@ export default ({
       originY: [1, 1],
     });
     dispatch({ type: "selling", payload: false });
-    accountsDispatch({ type: "credit", payload: aggregateCost });
+    applyAmount(aggregateCost);
   };
 
   const onFinishSale = () => {
@@ -94,12 +91,12 @@ export default ({
       dispatch({ type: "add_level" });
     }
     dispatch({ type: "buy_branch" });
-    accountsDispatch({ type: "debit", payload: branchCost });
+    applyAmount(-branchCost);
   };
 
   useEffect(() => {
     if (purchased) {
-      accountsDispatch({ type: "debit", payload: company_purchase_cost });
+      applyAmount(-company_purchase_cost);
     }
   }, [purchased]);
 
@@ -226,14 +223,12 @@ export default ({
 
               <Button
                 mt="0.5rem"
-                disabled={accountsState.balance < branchCost}
+                disabled={balance < branchCost}
                 onClick={() => buyBranch()}
                 borderRadius="0.5rem"
-                borderWidth={accountsState.balance < branchCost ? "1px" : "0"}
+                borderWidth={balance < branchCost ? "1px" : "0"}
                 _hover="#3182ce"
-                background={
-                  accountsState.balance > branchCost ? "#3182ce" : "transparent"
-                }
+                background={balance > branchCost ? "#3182ce" : "transparent"}
               >
                 Buy &nbsp;
                 <NumberFormat
