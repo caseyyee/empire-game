@@ -1,49 +1,22 @@
-import React, { useEffect, useRef, useContext } from "react";
+import React, { useContext } from "react";
+import useQueue from "../hooks/useQueue";
+import { AccountsDispatch, AccountsState } from "../containers/Container";
 
-import { AccountsDispatch } from "../containers/Container";
+export default () => {
+  const addBalance = useContext(AccountsDispatch);
+  const balance = useContext(AccountsState);
 
-export default ({ delay = 4000 } = {}) => {
-  const accountsDispatch = useContext(AccountsDispatch);
-
-  const queue = useRef([]);
-  const last = useRef(Date.now());
-
-  const dispatchQueue = () => {
-    if (queue.current.length !== 0) {
-      const sum = queue.current.reduce((a, b) => a + b);
-      accountsDispatch({ type: "apply_amount", payload: sum });
-      queue.current = [];
-    }
-  };
+  const { add } = useQueue();
 
   const applyAmount = (value) => {
     if (value === 0) {
       return;
     }
-
-    queue.current.push(value);
-
-    const now = Date.now();
-    const lastQueued = now - last.current;
-
-    if (queue.current.length === 1 && lastQueued > delay) {
-      dispatchQueue();
-    }
-
-    last.current = now;
+    add(value, (sum) => addBalance(sum));
   };
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      dispatchQueue();
-    }, delay);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
 
   return {
     applyAmount,
+    balance,
   };
 };

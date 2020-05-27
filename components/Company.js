@@ -8,7 +8,7 @@ import React, {
 import { Box, Flex, Badge, Button } from "@chakra-ui/core";
 import NumberFormat from "react-number-format";
 import { useAnimation } from "framer-motion";
-import { AccountsState, CompaniesDispatch } from "../containers/Container";
+import { CompaniesDispatch } from "../containers/Container";
 import useAccount from "../hooks/useAccount";
 import CompanyIconButton from "./CompanyIconButton";
 import CompanyLevelProgress from "./CompanyLevelProgress";
@@ -49,14 +49,13 @@ export default ({
   manager,
   purchased,
 }) => {
-  const accountsState = useContext(AccountsState);
   const companiesDispatch = useContext(CompaniesDispatch);
   const countdownInterval = useRef(null);
   const animationControl = useAnimation();
 
   const [state, dispatch] = useReducer(reducer, initialCompanyState);
 
-  const { applyAmount } = useAccount();
+  const { applyAmount, balance } = useAccount();
 
   const duration = production_time / state.level / 1000;
   const [countdown, setCountdown] = useState(duration);
@@ -64,7 +63,7 @@ export default ({
   const aggregateCost = state.branches * unit_price;
   const branchCost =
     state.branches * company_branch_cost * company_branch_cost_multiplier;
-  const canBePurchased = accountsState.balance >= company_purchase_cost;
+  const canBePurchased = balance >= company_purchase_cost;
 
   const getLevelProgress = (branches) =>
     (branches % branch_level_up_count) / branch_level_up_count;
@@ -224,14 +223,12 @@ export default ({
 
               <Button
                 mt="0.5rem"
-                disabled={accountsState.balance < branchCost}
+                disabled={balance < branchCost}
                 onClick={() => buyBranch()}
                 borderRadius="0.5rem"
-                borderWidth={accountsState.balance < branchCost ? "1px" : "0"}
+                borderWidth={balance < branchCost ? "1px" : "0"}
                 _hover="#3182ce"
-                background={
-                  accountsState.balance > branchCost ? "#3182ce" : "transparent"
-                }
+                background={balance > branchCost ? "#3182ce" : "transparent"}
               >
                 Buy &nbsp;
                 <NumberFormat

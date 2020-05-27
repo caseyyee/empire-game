@@ -1,11 +1,7 @@
 import React, { useContext } from "react";
 
 import { Box, Flex, Button } from "@chakra-ui/core";
-import {
-  AccountsState,
-  CompaniesState,
-  CompaniesDispatch,
-} from "../containers/Container";
+import { CompaniesState, CompaniesDispatch } from "../containers/Container";
 import useAccount from "../hooks/useAccount";
 import AppHead from "./AppHead";
 import NumberFormat from "react-number-format";
@@ -14,11 +10,10 @@ import CompanyIconButton from "./CompanyIconButton";
 import config from "../config";
 
 export default (props) => {
-  const accountsState = useContext(AccountsState);
   const companies = useContext(CompaniesState);
   const dispatch = useContext(CompaniesDispatch);
 
-  const { applyAmount } = useAccount();
+  const { applyAmount, balance } = useAccount();
 
   const hireManager = (key, cost) => {
     dispatch({ type: "hire_manager", payload: key });
@@ -31,7 +26,7 @@ export default (props) => {
       <Box p="3">
         {Object.keys(companies).map((key) => {
           const company = companies[key];
-          const enabled = company.manager_cost < accountsState.balance;
+          const enabled = company.manager_cost < balance;
           const elementProps = enabled && {
             background: "#2a4361",
             color: "white",

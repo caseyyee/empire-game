@@ -1,15 +1,11 @@
-import React, { createContext, useReducer } from "react";
-
+import React, { createContext, useReducer, useState, useRef } from "react";
+import useQueue from "../hooks/useQueue";
 import initialCompaniesState from "../data/companies";
 import menu from "../data/menu";
 
 const gameInitialState = {
   menu,
   current_menu: "news",
-};
-
-const accountsInitialState = {
-  balance: 0,
 };
 
 const companyStateDefaults = {
@@ -23,15 +19,6 @@ export const CompaniesState = createContext();
 export const CompaniesDispatch = createContext();
 export const GameState = createContext();
 export const GameDispatch = createContext();
-
-const accountsReducer = (state, action) => {
-  switch (action.type) {
-    case "apply_amount":
-      return { ...state, balance: state.balance + action.payload };
-    default:
-      throw new Error();
-  }
-};
 
 const companyReducer = (state, action) => {
   switch (action.type) {
@@ -78,12 +65,13 @@ const gameReducer = (state, action) => {
 };
 
 const Container = ({ children }) => {
-  const [accountsState, accountsDispatch] = useReducer(
-    accountsReducer,
-    accountsInitialState
-  );
-
+  const [balance, setBalance] = useState(0);
   const [gameState, gameDispatch] = useReducer(gameReducer, gameInitialState);
+  const { add } = useQueue();
+
+  const addBalance = (value) => {
+    add(value, (sum) => setBalance((prev) => prev + sum));
+  };
 
   const mergedInitialCompanyState = () => {
     let merged = {};
@@ -104,8 +92,8 @@ const Container = ({ children }) => {
   return (
     <GameDispatch.Provider value={gameDispatch}>
       <GameState.Provider value={gameState}>
-        <AccountsDispatch.Provider value={accountsDispatch}>
-          <AccountsState.Provider value={accountsState}>
+        <AccountsDispatch.Provider value={addBalance}>
+          <AccountsState.Provider value={balance}>
             <CompaniesDispatch.Provider value={dispatchCompanies}>
               <CompaniesState.Provider value={companies}>
                 {children}

@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
-import { AccountsState } from "../containers/Container";
+import React from "react";
 import { Box, Text } from "@chakra-ui/core";
 import NumberFormat from "react-number-format";
 import config from "../config";
+import useAccount from "../hooks/useAccount";
 
 export default (props) => {
-  const { balance } = useContext(AccountsState);
+  const { balance } = useAccount();
 
   return (
     <Box {...props}>
