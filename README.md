@@ -1,5 +1,7 @@
 # Empire Game
 
+Do you have what it takes to be a tech billionair?
+
 ### [Play Now](https://empire-game.now.sh/)
 
 ![Game Start](https://raw.githubusercontent.com/caseyyee/empire-game/master/screens/empire-1.png)
