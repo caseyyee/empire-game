@@ -1,6 +1,6 @@
 # Empire Game
 
-Do you have what it takes to be a tech billionair?
+Do you have what it takes to be a tech billionaire?
 
 ### [Play Now](https://empire-game.now.sh/)
 
